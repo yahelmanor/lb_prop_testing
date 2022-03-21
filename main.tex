@@ -1,0 +1,99 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{geometry}
+% \usepackage{asm}
+
+\newgeometry{
+    top=0.7in,
+    bottom=0.7in,
+    outer=0.7in,
+    inner=0.7in,
+}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
+\newtheorem{lem}{Lemma}
+\newtheorem{clm}{Claim}
+\newtheorem*{rem}{Remark}
+\newtheorem{thm}{Theorem}
+\newtheorem*{cor}{Corollary}
+
+
+\begin{document}
+
+\section{Intro}
+
+We start with discribing the setting of game.
+Given some sarch problem $\mathcal{S}$ on graphs i.e. $\mathcal{S}\subseteq \mathcal{G}_n \times O $
+we define the two paraty sarch problem $\mathcal{S} \circ \text{or}_2$, that is each of players get some edages in the graph
+and they need to solve togther the search problem over the union of thier graphs.
+
+We will construct a famaly of graph gadgets such that solving $\mathcal{S} \circ \text{or}_2$ over graph with those gadgets insted of edages
+is easy only if solving $\mathcal{S} \circ \text{IP}^{\log{n}}$ is easy. 
+By lifting theorems we know that $\mathcal{S} \circ \text{IP}^{\log{n}}$ is as hard 
+as the query complexity of $\mathcal{S}$ times factor of $\log{n}$.  
+
+\subsection{Summary of Results}
+
+\section{Constructions}
+
+% \begin{definition}
+Let $g_0$ be the following tree gadget of size $\log{n}$ that come as a replacment for an edge.
+assume we have vertices $v,u$ in the orginal graph then we will have $v',u'$ in the new graph. 
+Assume addionaly we have strings $a,b \in \{0,1\}^b$ such that $(v,u)\in E \Leftrightarrow \left <a,b \right > =1 $. 
+the main property we will want to preserve is connectivity.
+That is as a basic requierment we will requier that if $(v,u)\in E \Rightarrow v' \sim u'$. 
+For each edge in the original graph we will construct new $18k+2$ vertices labeled by the following names $$ T_i,F_i,T^{xy}_{P,i}  \text{ for }i = 0\dots k-1 \text{and} x,y,P \in \{0,1\}$$. Addionaly we have $T_k,F_k$.
+For the following section assume we have some canonical direction for any pair $(v,u)$. 
+
+Alice have the edges $(T_i,T^{{a_i}0}_{0,i}),(F_i,F^{{a_i}0}_{0,i}),(T_i,T^{{a_i}1}_{0,i}),(F_i,F^{{a_i}1}_{0,i})$
+while Bob have the edges $(T_{i+1},T^{0{b_i}}_{1,i}),(F_{i+1},F^{0{b_i}}_{1,i}),(T_{i+1},T^{1{b_i}}_{1,i}),(F_{i+1},F^{1{b_i}}_{1,i})$.
+Regerdless of Bob and Alice inputs we give them the edges $(T^{xy}_{0,i},T^{xy}_{1,i}) (F^{xy}_{0,i},F^{xy}_{1,i}) \text{ for } x,y \in \{(1,0),(0,0),(0,1)\}$ 
+For $x,y = (1,1)$ we add $(T^{11}_{0,i},F^{11}_{1,i})$ and $(F^{11}_{0,i},T^{11}_{1,i})$.
+At last we add an edge $(v,F_0)$ and $(u,T_k)$ 
+
+As before we want to show that $\left <a,b \right > =1 \Rightarrow v' \sim u'$, we will prove so by the following claims
+\begin{clm}
+    $\left < a_{< i},b_{< i} \right > = 1 \Rightarrow v \sim T_{i}$ and $\left < a_{< i},b_{< i} \right > = 0 \Rightarrow v \sim F_{i}$
+\end{clm}
+
+\begin{proof}
+    We will prove this by induction, the first case where $i=0$ is trivial, as $v$ is clearly connected to $T_0$. 
+    It holds that $T_i,F_i$ are connected to $T^{a_{i}b_{i}}_{0,i},T^{a_{i}b_{i}}_{0,i}$ and 
+    $T_{i+1},F_{i+1}$ are connected to $T^{a_{i}b_{i}}_{1,i},T^{a_{i}b_{i}}_{1,i}$. If $a_{i} \cdot b_{i} = 0$ then 
+    $T^{a_{i}b_{i}}_{0,i},F^{a_{i}b_{i}}_{0,i}$ is connected to $T^{a_{i}b_{i}}_{1,i},F^{a_{i}b_{i}}_{1,i}$ respectively. Therefore
+    assume without loss of generality that $\left < a_{< i},b_{< i} \right > = 0$ And therefore $v' \sim F_i$ as 
+    $ \left < a_{< i},b_{< i} \right > = \left < a_{< i},b_{< i} \right > + a_i\cdot b_i = \left < a_{< i+1},b_{< i+1} \right > $ 
+    the assertion holds as there is a path $F_i \to F^{a_{i}b_{i}}_{0,i} \to F^{a_{i}b_{i}}_{1,i} \to F_{i+1}$
+    and respectively there exist a path $T_i \to T_{i+1}$. In the case where $a_i \cdot b_i = 1$ we have that
+    $ \left < a_{< i},b_{< i} \right > = \left < a_{< i},b_{< i} \right > + a_i\cdot b_i - 1 = 1 + \left < a_{< i+1},b_{< i+1} \right > $  
+    and indeed it holds that we have a path $T_i \to T^{11}_{0,i} \to F^{11}_{1,i} \to F_{i+1}$ and respectively for $F_i \to T_{i+1}$, thus we complete the proof.
+\end{proof}
+
+It follows easily that $ \left < a,b \right > \Rightarrow v \sim u$. This claim alone wouldn't be sufficient for our usage (as just always connecting $v$ to $u$ will satisfy this claim as well).
+Therefore, we add the following claim 
+\begin{clm}
+    There is no path inside the gadget such that $v \to p_0 \cdots p_l \to F_i$ as long as $\left < a_{< i},b_{< i} \right > = 1$ (and vice versa for $T_i$). 
+\end{clm}
+
+\begin{proof}
+    The gadget itself is layered such that reaching $F_i$ is done only via reaching the $i+1$-th or the $i-1$-th layer immediately before.
+    We can trace in which vertex the path passed through in each layer, and get the list of vertices.
+    On the other hand by Claim "???" we know that $T_i$ is also reachable, and we can create the list of vertices for it as well
+    As a consequance we get that in some point the path for $F_i$ and for $T_i$ branch from one another. 
+    At this point we must have some vertex $F_j$ (w.l.o.g) that is connected to $T_{j+1} \text{ and } F_{j+1}$ (we chose j+1 w.l.o.g).
+    It should be obvies this statment is false as for all four options of $a_j,b_j$, it holds that $F_j$ is only connected to one of $T_{j+1}, F_{j+1}$.
+\end{proof}
+
+
+\subsection{Circle Freeness}
+
+\subsection{Connected Components}
+
+\subsection{???}
+
+\section{Lower Bounds for Property Testing in $R^{dt}$}
+
+\end{document}
